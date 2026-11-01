@@ -185,6 +185,9 @@ public class InvariantDeviceProfile implements SafeCloseable {
          */
         public int numDatabaseHotseatIcons;
 
+        /** Number of rows in the launcher dock (columns in a vertical dock). */
+        public int numHotseatRows = 1;
+
         public float[] hotseatBarBottomSpace;
         public float[] hotseatQsbSpace;
 
@@ -472,6 +475,8 @@ public class InvariantDeviceProfile implements SafeCloseable {
                         ? closestProfile.numDatabaseHotseatIcons : dbGridInfo.getNumHotseatColumns();
                 numDatabaseHotseatIcons = deviceType == TYPE_MULTI_DISPLAY
                         ? closestProfile.numDatabaseHotseatIcons : numShownHotseatIcons;
+                numHotseatRows = dbGridInfo.getNumHotseatRows();
+                numDatabaseHotseatIcons *= numHotseatRows;
                 hotseatBarBottomSpace = displayOption.hotseatBarBottomSpace;
                 hotseatQsbSpace = displayOption.hotseatQsbSpace;
 

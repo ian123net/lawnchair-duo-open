@@ -696,6 +696,12 @@ class PreferenceManager2 private constructor(private val context: Context) :
         onSet = { reloadHelper.reloadGrid() },
     )
 
+    val twoLineHomeLabels = preference(
+        key = booleanPreferencesKey(name = "two_line_home_labels"),
+        defaultValue = false,
+        onSet = { reloadHelper.restart() },
+    )
+
     val iconSwipeGestures = preference(
         key = booleanPreferencesKey(name = "icon_swipe_gestures"),
         defaultValue = false,

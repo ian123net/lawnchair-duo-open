@@ -215,6 +215,27 @@ public class GridSizeMigrationUtil {
         solveHotseatPlacement(helper, destHotseatSize,
                 srcReader, destReader, destHotseatEntries, hotseatToBeAdded);
 
+        // A smaller dock must not discard the apps or folders that no longer fit.
+        // Put overflow on new workspace pages, preserving folder contents.
+        if (!hotseatToBeAdded.isEmpty()) {
+            destReader.loadAllWorkspaceEntries();
+            int overflowScreen = Math.max(srcReader.mLastScreenId, destReader.mLastScreenId) + 1;
+            for (DbEntry entry : hotseatToBeAdded) {
+                entry.container = LauncherSettings.Favorites.CONTAINER_DESKTOP;
+                entry.cellX = 0;
+                entry.cellY = 0;
+            }
+            while (!hotseatToBeAdded.isEmpty()) {
+                int remaining = hotseatToBeAdded.size();
+                solveGridPlacement(helper, srcReader, destReader, overflowScreen++,
+                        targetSize.x, targetSize.y, hotseatToBeAdded,
+                        targetSize.x, targetSize.y);
+                if (hotseatToBeAdded.size() == remaining) {
+                    throw new IllegalStateException("Unable to place dock overflow on the workspace");
+                }
+            }
+        }
+
         return workspaceToBeAdded.isEmpty() && hotseatToBeAdded.isEmpty();
     }
 
@@ -731,6 +752,9 @@ public class GridSizeMigrationUtil {
         }
 
         public void updateContentValues(ContentValues values) {
+            if (container == LauncherSettings.Favorites.CONTAINER_DESKTOP) {
+                values.put(LauncherSettings.Favorites.CONTAINER, container);
+            }
             values.put(LauncherSettings.Favorites.SCREEN, screenId);
             values.put(LauncherSettings.Favorites.CELLX, cellX);
             values.put(LauncherSettings.Favorites.CELLY, cellY);

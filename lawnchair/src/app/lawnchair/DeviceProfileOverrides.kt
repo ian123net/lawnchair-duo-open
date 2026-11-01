@@ -64,11 +64,17 @@ class DeviceProfileOverrides(context: Context) : SafeCloseable {
         val numHotseatColumns: Int,
         val numRows: Int,
         val numColumns: Int,
+        val numHotseatRows: Int = 1,
     ) {
-        val dbFile get() = "launcher_${numRows}_${numColumns}_$numHotseatColumns.db"
+        val dbFile get() = if (numHotseatRows == 1) {
+            "launcher_${numRows}_${numColumns}_$numHotseatColumns.db"
+        } else {
+            "launcher_${numRows}_${numColumns}_${numHotseatColumns}_${numHotseatRows}rows.db"
+        }
 
         constructor(prefs: PreferenceManager) : this(
             numHotseatColumns = prefs.hotseatColumns.get(),
+            numHotseatRows = prefs.hotseatRows.get().coerceIn(1, 2),
             numRows = prefs.workspaceRows.get(),
             numColumns = prefs.workspaceColumns.get(),
         )

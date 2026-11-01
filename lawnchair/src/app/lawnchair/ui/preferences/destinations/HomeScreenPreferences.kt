@@ -202,6 +202,11 @@ fun HomeScreenPreferences(
             )
             val homeScreenLabelsAdapter = prefs2.showIconLabelsOnHomeScreen.getAdapter()
             SwitchPreference(
+                adapter = prefs2.twoLineHomeLabels.getAdapter(),
+                label = stringResource(id = R.string.two_line_home_labels_label),
+                description = stringResource(id = R.string.two_line_home_labels_description),
+            )
+            SwitchPreference(
                 adapter = homeScreenLabelsAdapter,
                 label = stringResource(id = R.string.show_labels),
             )

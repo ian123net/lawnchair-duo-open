@@ -921,4 +921,7 @@
     <string name="grant_requested_permissions_tap">Tap to grant permissions</string>
     <!-- Message shown when all home screen views are removed -->
     <string name="home_screen_all_views_removed_msg">Home screen cleared</string>
+    <string name="dock_rows_label">Dock rows</string>
+    <string name="two_line_home_labels_label">Two-line app names</string>
+    <string name="two_line_home_labels_description">Wrap long names onto two lines on the home screen and in the dock</string>
 </resources>

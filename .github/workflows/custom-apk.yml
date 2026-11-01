@@ -1,0 +1,33 @@
+name: Build Lawnchair 15 Custom
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [two-row-dock-labels]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v5
+      - name: Check dock position persistence
+        run: python3 tests/customizations/run_regressions.py
+      - name: Build installable custom APK
+        run: ./gradlew assembleLawnWithQuickstepGithubDebug
+      - name: Check formatting
+        run: ./gradlew spotlessCheck
+      - uses: actions/upload-artifact@v6
+        with:
+          name: Lawnchair-15-Custom
+          path: build/outputs/apk/lawnWithQuickstepGithub/debug/*.apk
+          if-no-files-found: error

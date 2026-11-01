@@ -546,7 +546,7 @@ public class LauncherPreviewRenderer extends ContextWrapper
             }
         }
         IntArray ranks = getMissingHotseatRanks(currentWorkspaceItems,
-                mDp.numShownHotseatIcons);
+                mDp.getHotseatSlotCount());
         FixedContainerItems hotseatPredictions = dataModel.extraItems.get(CONTAINER_HOTSEAT_PREDICTION);
         List<ItemInfo> predictions = hotseatPredictions == null
                 ? Collections.emptyList()

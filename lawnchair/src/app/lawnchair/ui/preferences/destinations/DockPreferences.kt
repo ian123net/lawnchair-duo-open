@@ -134,6 +134,12 @@ fun HotseatBackgroundSettings(prefs: PreferenceManager, prefs2: PreferenceManage
 @Composable
 fun GridSettings(prefs: PreferenceManager, prefs2: PreferenceManager2) {
     SliderPreference(
+        label = stringResource(id = R.string.dock_rows_label),
+        adapter = prefs.hotseatRows.getAdapter(),
+        step = 1,
+        valueRange = 1..2,
+    )
+    SliderPreference(
         label = stringResource(id = R.string.dock_icons),
         adapter = prefs.hotseatColumns.getAdapter(),
         step = 1,
@@ -164,6 +170,8 @@ fun ColumnScope.DockPreferencesPreview(modifier: Modifier = Modifier) {
         val adapters = listOf(
             prefs2.hotseatMode.getAdapter(),
             prefs.hotseatColumns.getAdapter(),
+            prefs.hotseatRows.getAdapter(),
+            prefs2.twoLineHomeLabels.getAdapter(),
             prefs2.themedHotseatQsb.getAdapter(),
             prefs.hotseatQsbCornerRadius.getAdapter(),
             prefs.hotseatQsbAlpha.getAdapter(),
@@ -201,7 +209,12 @@ fun ColumnScope.DockPreferencesPreview(modifier: Modifier = Modifier) {
                     )
                     key(adapters.map { it.state.value }.toTypedArray()) {
                         DummyLauncherLayout(
-                            idp = createPreviewIdp { copy(numHotseatColumns = prefs.hotseatColumns.get()) },
+                            idp = createPreviewIdp {
+                                copy(
+                                    numHotseatColumns = prefs.hotseatColumns.get(),
+                                    numHotseatRows = prefs.hotseatRows.get().coerceIn(1, 2),
+                                )
+                            },
                             modifier = Modifier.fillMaxSize(),
                         )
                     }

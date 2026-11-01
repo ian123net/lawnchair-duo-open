@@ -45,6 +45,7 @@ import com.hoko.blur.HokoBlur;
 import com.patrykmichalik.opto.core.PreferenceExtensionsKt;
 
 import app.lawnchair.hotseat.DisabledHotseat;
+import app.lawnchair.hotseat.DockGrid;
 import app.lawnchair.hotseat.HotseatMode;
 import app.lawnchair.hotseat.LawnchairHotseat;
 import app.lawnchair.preferences.PreferenceManager;
@@ -131,14 +132,16 @@ public class Hotseat extends CellLayout implements Insettable {
      * Returns orientation specific cell X given invariant order in the hotseat
      */
     public int getCellXFromOrder(int rank) {
-        return mHasVerticalHotseat ? 0 : rank;
+        int columns = mActivity.getDeviceProfile().numShownHotseatIcons;
+        return DockGrid.cellX(rank, columns, mHasVerticalHotseat);
     }
 
     /**
      * Returns orientation specific cell Y given invariant order in the hotseat
      */
     public int getCellYFromOrder(int rank) {
-        return mHasVerticalHotseat ? (getCountY() - (rank + 1)) : 0;
+        int columns = mActivity.getDeviceProfile().numShownHotseatIcons;
+        return DockGrid.cellY(rank, columns, mHasVerticalHotseat);
     }
 
     boolean isHasVerticalHotseat() {
@@ -178,9 +181,9 @@ public class Hotseat extends CellLayout implements Insettable {
 
         resetCellSize(dp);
         if (hasVerticalHotseat) {
-            setGridSize(1, dp.numShownHotseatIcons);
+            setGridSize(dp.numHotseatRows, dp.numShownHotseatIcons);
         } else {
-            setGridSize(dp.numShownHotseatIcons, 1);
+            setGridSize(dp.numShownHotseatIcons, dp.numHotseatRows);
         }
     }
 

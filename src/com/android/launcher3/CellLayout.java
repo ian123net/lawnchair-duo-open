@@ -395,8 +395,9 @@ public class CellLayout extends ViewGroup {
                 mBorderSpace = new Point(deviceProfile.folderCellLayoutBorderSpacePx);
                 break;
             case HOTSEAT:
-                mBorderSpace = new Point(deviceProfile.hotseatBorderSpace,
-                        deviceProfile.hotseatBorderSpace);
+                mBorderSpace = deviceProfile.isVerticalBarLayout()
+                        ? new Point(deviceProfile.getHotseatRowSpacing(), deviceProfile.hotseatBorderSpace)
+                        : new Point(deviceProfile.hotseatBorderSpace, deviceProfile.getHotseatRowSpacing());
                 break;
             case WORKSPACE:
             default:

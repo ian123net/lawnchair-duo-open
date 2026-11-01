@@ -227,6 +227,8 @@ public class DeviceProfile {
 
     // Hotseat
     public int numShownHotseatIcons;
+    public int numHotseatRows = 1;
+    public int workspaceLabelLines = 1;
     public int hotseatCellHeightPx;
     private int mHotseatColumnSpan;
     private int mHotseatWidthPx; // not used in vertical bar layout
@@ -587,7 +589,11 @@ public class DeviceProfile {
         isQsbInline = mIsScalableGrid && inv.inlineQsb[mTypeIndex] && canQsbInline;
 
         areNavButtonsInline = isTaskbarPresent && !isGestureMode;
-        numShownHotseatIcons = isTwoPanels ? inv.numDatabaseHotseatIcons : inv.numShownHotseatIcons;
+        numHotseatRows = inv.numHotseatRows;
+        numShownHotseatIcons = isTwoPanels
+                ? inv.numDatabaseHotseatIcons / numHotseatRows : inv.numShownHotseatIcons;
+        workspaceLabelLines = PreferenceExtensionsKt.firstBlocking(
+                preferenceManager2.getTwoLineHomeLabels()) ? 2 : 1;
         mHotseatColumnSpan = inv.numColumns;
 
         numShownAllAppsColumns = isTwoPanels ? inv.numDatabaseAllAppsColumns : inv.numAllAppsColumns;
@@ -933,7 +939,7 @@ public class DeviceProfile {
     private void updateHotseatSizes(int hotseatIconSizePx) {
         // Ensure there is enough space for folder icons, which have a slightly larger
         // radius.
-        int iconTextHeight = Utilities.calculateTextHeight(iconTextSizePx);
+        int iconTextHeight = Utilities.calculateTextHeight(iconTextSizePx) * workspaceLabelLines;
         var isLabelInDock = PreferenceExtensionsKt.firstBlocking(preferenceManager2.getEnableLabelInDock());
 
         hotseatCellHeightPx = getIconSizeWithOverlap(hotseatIconSizePx * 2) - hotseatIconSizePx / 2;
@@ -945,18 +951,21 @@ public class DeviceProfile {
         hotseatBarBottomSpacePx *= PreferenceExtensionsKt
                 .firstBlocking(preferenceManager2.getHotseatBottomFactor());
 
+        int extraRowsHeight = (numHotseatRows - 1) * (hotseatCellHeightPx + getHotseatRowSpacing());
+
         if (isVerticalBarLayout()) {
             hotseatBarSizePx = hotseatIconSizePx + mHotseatBarEdgePaddingPx
-                    + mHotseatBarWorkspaceSpacePx + space;
+                    + mHotseatBarWorkspaceSpacePx + space
+                    + (numHotseatRows - 1) * (hotseatIconSizePx + getHotseatRowSpacing());
         } else if (isQsbInline) {
             hotseatBarSizePx = Math.max(hotseatIconSizePx, hotseatQsbVisualHeight)
-                    + hotseatBarBottomSpacePx + space;
+                    + hotseatBarBottomSpacePx + space + extraRowsHeight;
         } else {
             hotseatBarSizePx = hotseatIconSizePx
                     + hotseatQsbSpace
                     + hotseatQsbVisualHeight
                     + hotseatBarBottomSpacePx
-                    + space;
+                    + space + extraRowsHeight;
         }
         var isHotseatEnabled = PreferenceExtensionsKt.firstBlocking(preferenceManager2.isHotseatEnabled());
         if (!isHotseatEnabled) {
@@ -976,7 +985,7 @@ public class DeviceProfile {
         updateHotseatWidthAndBorderSpace(inv.numColumns);
         int numWorkspaceColumns = getPanelCount() * inv.numColumns;
         if (isTwoPanels) {
-            updateHotseatWidthAndBorderSpace(inv.numDatabaseHotseatIcons);
+            updateHotseatWidthAndBorderSpace(inv.numDatabaseHotseatIcons / numHotseatRows);
             // If hotseat doesn't fit with current width, increase column span to fit by
             // multiple
             // of 2.
@@ -1267,7 +1276,7 @@ public class DeviceProfile {
 
             CellContentDimensions cellContentDimensions = new CellContentDimensions(iconSizePx,
                     iconDrawablePaddingPx,
-                    iconTextSizePx);
+                    iconTextSizePx, workspaceLabelLines);
             int cellContentHeight = cellContentDimensions.resizeToFitCellHeight(cellHeightPx,
                     mIconSizeSteps);
             iconSizePx = cellContentDimensions.getIconSizePx();
@@ -1304,7 +1313,8 @@ public class DeviceProfile {
                 }
             }
 
-            int cellTextAndPaddingHeight = iconDrawablePaddingPx + Utilities.calculateTextHeight(iconTextSizePx);
+            int cellTextAndPaddingHeight = iconDrawablePaddingPx
+                    + Utilities.calculateTextHeight(iconTextSizePx) * workspaceLabelLines;
             int cellContentHeight = iconSizePx + cellTextAndPaddingHeight;
             if (cellHeightPx < cellContentHeight) {
                 // If cellHeight no longer fit iconSize, reduce borderSpace to make cellHeight
@@ -1331,7 +1341,8 @@ public class DeviceProfile {
                         iconSizePx = (int) (iconSizePx * ratio);
                         iconTextSizePx = (int) (iconTextSizePx * ratio);
                     }
-                    cellTextAndPaddingHeight = iconDrawablePaddingPx + Utilities.calculateTextHeight(iconTextSizePx);
+                    cellTextAndPaddingHeight = iconDrawablePaddingPx
+                            + Utilities.calculateTextHeight(iconTextSizePx) * workspaceLabelLines;
                 }
                 cellContentHeight = iconSizePx + cellTextAndPaddingHeight;
             }
@@ -1342,7 +1353,7 @@ public class DeviceProfile {
             cellWidthPx = iconSizePx + iconDrawablePaddingPx;
             cellHeightPx = getIconSizeWithOverlap(iconSizePx)
                     + iconDrawablePaddingPx
-                    + Utilities.calculateTextHeight(iconTextSizePx);
+                    + Utilities.calculateTextHeight(iconTextSizePx) * workspaceLabelLines;
             int cellPaddingY = (getCellSize().y - cellHeightPx) / 2;
             if (iconDrawablePaddingPx > cellPaddingY && !isVerticalLayout
                     && !isMultiWindowMode) {
@@ -1921,7 +1932,8 @@ public class DeviceProfile {
         } else if (isTaskbarPresent || isTablet) {
             // Center the QSB vertically with hotseat
             int hotseatBarBottomPadding = getHotseatBarBottomPadding();
-            int hotseatBarTopPadding = hotseatBarSizePx - hotseatBarBottomPadding - hotseatCellHeightPx;
+            int hotseatBarTopPadding = hotseatBarSizePx - hotseatBarBottomPadding
+                    - getHotseatGridHeight();
 
             int hotseatWidth = getHotseatRequiredWidth();
             int startSpacing;
@@ -2046,7 +2058,7 @@ public class DeviceProfile {
         if (isTaskbarPresent) { // QSB on top or inline
             return hotseatBarBottomSpacePx - (Math.abs(hotseatCellHeightPx - iconSizePx) / 2);
         } else {
-            return hotseatBarSizePx - hotseatCellHeightPx;
+            return hotseatBarSizePx - getHotseatGridHeight();
         }
     }
 
@@ -2157,6 +2169,18 @@ public class DeviceProfile {
         return isVerticalBarLayout();
     }
 
+    public int getHotseatGridHeight() {
+        return hotseatCellHeightPx * numHotseatRows + getHotseatRowSpacing() * (numHotseatRows - 1);
+    }
+
+    public int getHotseatRowSpacing() {
+        return pxFromDp(8, mMetrics);
+    }
+
+    public int getHotseatSlotCount() {
+        return numShownHotseatIcons * numHotseatRows;
+    }
+
     public int getCellContentHeight(@ContainerType int containerType) {
         switch (containerType) {
             case CellLayout.WORKSPACE:
@@ -2166,7 +2190,10 @@ public class DeviceProfile {
             case CellLayout.HOTSEAT:
                 // The hotseat is the only container where the cell height is going to be
                 // different from the content within that cell.
-                return iconSizePx;
+                return PreferenceExtensionsKt.firstBlocking(preferenceManager2.getEnableLabelInDock())
+                        ? iconSizePx + iconDrawablePaddingPx
+                                + Utilities.calculateTextHeight(iconTextSizePx) * workspaceLabelLines
+                        : iconSizePx;
             default:
                 // ??
                 return 0;

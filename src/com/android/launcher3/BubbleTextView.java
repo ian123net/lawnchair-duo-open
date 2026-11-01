@@ -306,6 +306,10 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver,
         mDotParams = new DotRenderer.DrawParams();
 
         mCurrentLocale = context.getResources().getConfiguration().locale;
+        if (usesTwoLineHomeLabel()) {
+            setSingleLine(false);
+            setMaxLines(2);
+        }
         setEllipsize(TruncateAt.END);
         setAccessibilityDelegate(mActivity.getAccessibilityDelegate());
         setTextAlpha(1f);
@@ -315,7 +319,7 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver,
     protected void onFocusChanged(boolean focused, int direction, Rect previouslyFocusedRect) {
         // Disable marques when not focused to that, so that updating text does not
         // cause relayout.
-        setEllipsize(focused ? TruncateAt.MARQUEE : TruncateAt.END);
+        setEllipsize(focused && !usesTwoLineHomeLabel() ? TruncateAt.MARQUEE : TruncateAt.END);
         resetIconScale(true);
         super.onFocusChanged(focused, direction, previouslyFocusedRect);
     }
@@ -341,7 +345,7 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver,
         setBackground(null);
         if (com.android.launcher3.config.FeatureFlags.twoLineAllApps(this.getContext())
                 || com.android.launcher3.config.FeatureFlags.ENABLE_TWOLINE_DEVICESEARCH.get()) {
-            setMaxLines(1);
+            setMaxLines(usesTwoLineHomeLabel() ? 2 : 1);
         }
 
         setTag(null);
@@ -493,6 +497,11 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver,
         return (com.android.launcher3.config.FeatureFlags.twoLineAllApps(this.getContext()) && mDisplay == DISPLAY_ALL_APPS)
                 || (com.android.launcher3.config.FeatureFlags.ENABLE_TWOLINE_DEVICESEARCH.get()
                         && mDisplay == DISPLAY_SEARCH_RESULT);
+    }
+
+    private boolean usesTwoLineHomeLabel() {
+        return mDisplay == DISPLAY_WORKSPACE && !mLayoutHorizontal
+                && mDeviceProfile.workspaceLabelLines == 2;
     }
 
     @UiThread
@@ -804,8 +813,8 @@ public class BubbleTextView extends TextView implements ItemInfoUpdateReceiver,
         if (mCenterVertically) {
             Paint.FontMetrics fm = getPaint().getFontMetrics();
             int cellHeightPx = mIconSize + getCompoundDrawablePadding() +
-                    (int) Math.ceil(fm.bottom - fm.top);
-            setPadding(getPaddingLeft(), (height - cellHeightPx) / 2, getPaddingRight(),
+                    (int) Math.ceil(fm.bottom - fm.top) * (usesTwoLineHomeLabel() ? 2 : 1);
+            setPadding(getPaddingLeft(), Math.max(0, (height - cellHeightPx) / 2), getPaddingRight(),
                     getPaddingBottom());
         }
         // Only apply two line for all_apps and device search only if necessary.

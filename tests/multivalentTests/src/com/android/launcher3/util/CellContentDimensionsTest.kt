@@ -63,6 +63,16 @@ class CellContentDimensionsTest {
     }
 
     @Test
+    fun twoLineLabelsReserveSpaceAndShrinkToFit() {
+        val oneLine = CellContentDimensions(66, 8, 14)
+        val twoLines = CellContentDimensions(66, 8, 14, labelLineCount = 2)
+        assertThat(twoLines.getCellContentHeight() - oneLine.getCellContentHeight())
+            .isEqualTo(com.android.launcher3.Utilities.calculateTextHeight(14f))
+        assertThat(twoLines.resizeToFitCellHeight(93, iconSizeSteps)).isAtMost(93)
+        assertThat(twoLines.labelLineCount).isEqualTo(2)
+    }
+
+    @Test
     fun decreasePadding() {
         val cellSize = Pair(67, 87)
         val cellContentDimensions =

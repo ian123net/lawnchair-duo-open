@@ -22,6 +22,8 @@ import com.android.launcher3.model.data.ItemInfo;
 
 import java.util.Objects;
 
+import app.lawnchair.hotseat.DockGrid;
+
 /**
  * Class for mapping between model position and presenter position.
  */
@@ -49,8 +51,9 @@ public class CellPosMapper {
     public CellPos mapPresenterToModel(int presenterX, int presenterY, int presenterScreen,
             int container) {
         if (container == Favorites.CONTAINER_HOTSEAT) {
-            presenterScreen = mHasVerticalHotseat
-                    ? mNumOfHotseat - presenterY - 1 : presenterX;
+            presenterScreen = mNumOfHotseat > 0
+                    ? DockGrid.rank(presenterX, presenterY, mNumOfHotseat, mHasVerticalHotseat)
+                    : presenterX;
         }
         return new CellPos(presenterX, presenterY, presenterScreen);
     }
@@ -63,7 +66,11 @@ public class CellPosMapper {
         private final int mColumnCount;
 
         public TwoPanelCellPosMapper(int columnCount) {
-            super(false, -1);
+            this(columnCount, -1);
+        }
+
+        public TwoPanelCellPosMapper(int columnCount, int hotseatColumns) {
+            super(false, hotseatColumns);
             mColumnCount = columnCount;
         }
 

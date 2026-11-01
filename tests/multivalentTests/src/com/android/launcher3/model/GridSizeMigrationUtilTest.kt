@@ -596,6 +596,20 @@ class GridSizeMigrationUtilTest {
         assertThat(c.getString(intentIndex)).contains(testPackage4)
 
         c.close()
+
+        // The fifth app must survive shrinking the dock, on a workspace page.
+        db.query(
+            TABLE_NAME, arrayOf(INTENT, CELLX, CELLY),
+            "container=$CONTAINER_DESKTOP", null, null, null, null
+        ).use { overflow ->
+            assertThat(overflow.count).isEqualTo(1)
+            assertThat(overflow.moveToFirst()).isTrue()
+            assertThat(overflow.getString(0)).contains(testPackage5)
+            assertThat(overflow.getInt(1)).isAtLeast(0)
+            assertThat(overflow.getInt(1)).isLessThan(idp.numColumns)
+            assertThat(overflow.getInt(2)).isAtLeast(0)
+            assertThat(overflow.getInt(2)).isLessThan(idp.numRows)
+        }
     }
 
     /**

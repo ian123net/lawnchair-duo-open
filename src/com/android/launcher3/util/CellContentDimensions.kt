@@ -18,10 +18,11 @@ package com.android.launcher3.util
 import com.android.launcher3.Utilities
 import kotlin.math.max
 
-class CellContentDimensions(
+class CellContentDimensions @JvmOverloads constructor(
     var iconSizePx: Int,
     var iconDrawablePaddingPx: Int,
-    var iconTextSizePx: Int
+    var iconTextSizePx: Int,
+    val labelLineCount: Int = 1
 ) {
     /**
      * This method goes through some steps to reduce the padding between icon and label, icon size
@@ -78,6 +79,6 @@ class CellContentDimensions(
     /** Calculate new cellContentHeight */
     fun getCellContentHeight(): Int {
         val iconTextHeight = Utilities.calculateTextHeight(iconTextSizePx.toFloat())
-        return iconSizePx + iconDrawablePaddingPx + iconTextHeight
+        return iconSizePx + iconDrawablePaddingPx + iconTextHeight * labelLineCount
     }
 }

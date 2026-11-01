@@ -243,8 +243,8 @@ android {
         }
 
         debug {
-            applicationIdSuffix ".debug"
-            resValue("string", "derived_app_name", "Lawnchair (Debug)")
+            applicationIdSuffix ".tworow"
+            resValue("string", "derived_app_name", "Lawnchair 15 Custom")
         }
 
         release {

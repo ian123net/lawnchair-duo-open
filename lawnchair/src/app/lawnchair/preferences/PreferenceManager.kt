@@ -50,6 +50,7 @@ class PreferenceManager private constructor(private val context: Context) :
     val shadowBGIcons = BoolPref("pref_shadowBGIcons", true, recreate)
     val addIconToHome = BoolPref("pref_add_icon_to_home", true)
     val hotseatColumns = IntPref("pref_hotseatColumns", 4, reloadGrid)
+    val hotseatRows = IntPref("pref_hotseatRows", 1, reloadGrid)
     val workspaceColumns = IntPref("pref_workspaceColumns", 4)
     val workspaceRows = IntPref("pref_workspaceRows", 5)
     val workspaceIncreaseMaxGridSize = BoolPref("pref_workspace_increase_max_grid_size", false)
