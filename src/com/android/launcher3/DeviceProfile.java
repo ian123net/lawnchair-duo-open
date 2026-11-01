@@ -944,6 +944,13 @@ public class DeviceProfile {
 
         hotseatCellHeightPx = getIconSizeWithOverlap(hotseatIconSizePx * 2) - hotseatIconSizePx / 2;
         hotseatCellHeightPx += isLabelInDock ? iconTextHeight : 0;
+        if (numHotseatRows > 1) {
+            // The single-row dock has generous vertical padding. Repeating that padding
+            // between rows leaves a large empty band, so fit each row to its content.
+            // Keep the folder overlap allowance and the full label height.
+            hotseatCellHeightPx = getIconSizeWithOverlap(hotseatIconSizePx)
+                    + (isLabelInDock ? iconDrawablePaddingPx + iconTextHeight : 0);
+        }
         hotseatQsbSpace += isLabelInDock ? (iconTextHeight / 2) : 0;
 
         var space = Math.abs(hotseatCellHeightPx / 2) - 16;
@@ -2174,7 +2181,7 @@ public class DeviceProfile {
     }
 
     public int getHotseatRowSpacing() {
-        return pxFromDp(8, mMetrics);
+        return pxFromDp(4, mMetrics);
     }
 
     public int getHotseatSlotCount() {

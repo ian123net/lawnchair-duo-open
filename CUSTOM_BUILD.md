@@ -17,6 +17,8 @@ Both settings retain the original defaults (one dock row, one label line).
 Reducing dock capacity moves overflow apps and folders onto new home-screen
 pages. This preserves shortcuts and folder contents instead of discarding them.
 The dock and workspace reserve space for the additional rows and text.
+The two-row dock uses compact cells sized to the icons and visible labels, with
+a 4 dp gap between cells. The original single-row cell sizing is unchanged.
 
 ## Install or build
 
